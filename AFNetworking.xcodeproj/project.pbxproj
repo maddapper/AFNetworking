@@ -6,6 +6,20 @@
 	objectVersion = 47;
 	objects = {
 
+/* Begin PBXAggregateTarget section */
+		FD0183322863DF6A00F5493A /* xcFramework_debug */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = FD0183332863DF6A00F5493A /* Build configuration list for PBXAggregateTarget "xcFramework_debug" */;
+			buildPhases = (
+				FD0183362863DF7000F5493A /* ShellScript */,
+			);
+			dependencies = (
+			);
+			name = xcFramework_debug;
+			productName = xcFramework_debug;
+		};
+/* End PBXAggregateTarget section */
+
 /* Begin PBXBuildFile section */
 		1BF9F9601C87832B00F1F35A /* AFImageResponseSerializerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BF9F95F1C87832B00F1F35A /* AFImageResponseSerializerTests.m */; };
 		1BF9F9611C87843200F1F35A /* AFImageResponseSerializerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BF9F95F1C87832B00F1F35A /* AFImageResponseSerializerTests.m */; };
@@ -834,6 +848,11 @@
 						CreatedOnToolsVersion = 7.0.1;
 						ProvisioningStyle = Automatic;
 					};
+					FD0183322863DF6A00F5493A = {
+						CreatedOnToolsVersion = 13.4.1;
+						DevelopmentTeam = FLA943DDZ8;
+						ProvisioningStyle = Automatic;
+					};
 				};
 			};
 			buildConfigurationList = 299522331BBF104D00859F49 /* Build configuration list for PBXProject "AFNetworking" */;
@@ -856,6 +875,7 @@
 				298D7C3A1BC2C79500FD3B3E /* AFNetworking iOS Tests */,
 				298D7C491BC2C7B200FD3B3E /* AFNetworking macOS Tests */,
 				2987B0AD1BC408A200179A4C /* AFNetworking tvOS Tests */,
+				FD0183322863DF6A00F5493A /* xcFramework_debug */,
 			);
 		};
 /* End PBXProject section */
@@ -971,6 +991,26 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		FD0183362863DF7000F5493A /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "WORKSPACE_NAME=\"${PROJECT}.xcworkspace\"\nSCHEME_NAME=\"${PROJECT} iOS\"\nFRAMEWORK_NAME=\"${PROJECT}\"\nSIMULATOR_ARCHIVE_PATH=\"${BUILD_DIR}/${CONFIGURATION}/${FRAMEWORK_NAME}-iphonesimulator.xcarchive\"\nDEVICE_ARCHIVE_PATH=\"${BUILD_DIR}/${CONFIGURATION}/${FRAMEWORK_NAME}-iphoneos.xcarchive\"\nOUTPUT_FOLDER=\"./build/\"\n\n# Simulator xcarchive\nxcodebuild archive \\\n  -workspace ${WORKSPACE_NAME} \\\n  -scheme \"${SCHEME_NAME}\" \\\n  -archivePath ${SIMULATOR_ARCHIVE_PATH} \\\n  -sdk iphonesimulator \\\n  -configuration Debug \\\n  SKIP_INSTALL=NO | xcpretty\n  \n# Device xcarchive\nxcodebuild archive \\\n  -workspace ${WORKSPACE_NAME} \\\n  -scheme \"${SCHEME_NAME}\" \\\n  -archivePath ${DEVICE_ARCHIVE_PATH} \\\n  -sdk iphoneos \\\n  -configuration Debug \\\n  SKIP_INSTALL=NO | xcpretty\n  \niOSBCMaps=()\n\necho -e \"\\nFinding iOS Bitcode Symbol Maps\"\nwhile IFS= read -d '' -r filename; do\n    iOSBCMaps+=(\"$filename\")\ndone < <(find $DEVICE_ARCHIVE_PATH -name \"*.bcsymbolmap\" -print0)\necho find $DEVICE_ARCHIVE_PATH -name \"*.bcsymbolmap\" -print0\n\niOSDebugSymbols=\"\"\niOSBCMapCount=${#iOSBCMaps[@]}\n\necho -e \"\\nGenerating iOS Bitcode Symbol Map\"\nfor ((i=0;i<iOSBCMapCount;i++)); do\n  iOSDebugSymbols+=\" -debug-symbols ${iOSBCMaps[i]}\"\ndone\n\necho \"iOSDebugSymbols $iOSDebugSymbols\"\n  \n  \n# Clean up old output directory\nrm -rf \"${OUTPUT_FOLDER}\"\n\n# Create xcframwork combine of all frameworks\nxcodebuild -create-xcframework \\\n  -framework ${SIMULATOR_ARCHIVE_PATH}/Products/Library/Frameworks/${FRAMEWORK_NAME}.framework \\\n  -debug-symbols ${SIMULATOR_ARCHIVE_PATH}/dSYMs/${FRAMEWORK_NAME}.framework.dSYM \\\n  -framework ${DEVICE_ARCHIVE_PATH}/Products/Library/Frameworks/${FRAMEWORK_NAME}.framework \\\n  -debug-symbols ${DEVICE_ARCHIVE_PATH}/dSYMs/${FRAMEWORK_NAME}.framework.dSYM \\\n  $iOSDebugSymbols \\\n  -output ${OUTPUT_FOLDER}/${FRAMEWORK_NAME}.xcframework\n   \nopen ${OUTPUT_FOLDER}\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		2987B0A01BC408A200179A4C /* Sources */ = {
@@ -1466,7 +1506,7 @@
 		299522421BBF104D00859F49 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				APPLICATION_EXTENSION_API_ONLY = YES;
+				APPLICATION_EXTENSION_API_ONLY = NO;
 				BITCODE_GENERATION_MODE = marker;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_IDENTITY = "";
@@ -1474,6 +1514,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -1487,13 +1528,15 @@
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
 				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
 		299522431BBF104D00859F49 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				APPLICATION_EXTENSION_API_ONLY = YES;
+				APPLICATION_EXTENSION_API_ONLY = NO;
 				BITCODE_GENERATION_MODE = bitcode;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_IDENTITY = "";
@@ -1501,6 +1544,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -1514,6 +1558,8 @@
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
 				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -1623,6 +1669,24 @@
 			};
 			name = Release;
 		};
+		FD0183342863DF6A00F5493A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = FLA943DDZ8;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		FD0183352863DF6A00F5493A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = FLA943DDZ8;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1694,6 +1758,15 @@
 			buildConfigurations = (
 				2995227D1BBF136400859F49 /* Debug */,
 				2995227E1BBF136400859F49 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FD0183332863DF6A00F5493A /* Build configuration list for PBXAggregateTarget "xcFramework_debug" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FD0183342863DF6A00F5493A /* Debug */,
+				FD0183352863DF6A00F5493A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
